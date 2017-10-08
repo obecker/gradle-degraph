@@ -1,0 +1,49 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'groovy'
+}
+
+ext {
+    degraphVersion = '0.1.4'
+}
+
+group 'de.obqo.gradle'
+version "${degraphVersion}.0-SNAPSHOT"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+task createClasspathManifest {
+    def outputDir = file("$buildDir/classpathManifest")
+    def pluginClasspath = sourceSets.main.runtimeClasspath
+
+    inputs.files pluginClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = pluginClasspath.join("\n")
+    }
+}
+
+dependencies {
+    compile "de.schauderhaft.degraph:degraph-check:${degraphVersion}"
+
+    testCompile gradleTestKit()
+    testCompile 'junit:junit:4.12'
+    testCompile 'commons-io:commons-io:2.5'
+    testRuntime files(createClasspathManifest)
+}
+
+gradlePlugin {
+    plugins {
+        degraphPlugin {
+            id = 'de.obqo.gradle.degraph'
+            implementationClass = 'de.obqo.gradle.degraph.DegraphPlugin'
+        }
+    }
+}

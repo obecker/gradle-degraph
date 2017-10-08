@@ -1,0 +1,9 @@
+plugins {
+    id 'de.obqo.gradle.degraph' version '0.1.4.0-SNAPSHOT'
+}
+
+degraph {
+    noJars = true
+    including = 'demo.other.**'
+    printTo = file("$buildDir/reports/degraph/success.graphml")
+}
