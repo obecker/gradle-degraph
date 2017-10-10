@@ -1,6 +1,8 @@
 package de.obqo.gradle.degraph;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
@@ -11,58 +13,56 @@ import org.gradle.api.Project;
  */
 public class DegraphExtension {
 
-    private boolean noJars;
-    private String including;
-    private String excluding;
+    private final List<String> including;
+    private final List<String> excluding;
     private File printTo;
     private File printOnFailure;
     private final NamedDomainObjectContainer<SlicingExtension> slicings;
 
     public DegraphExtension(Project project) {
+        this.including = new ArrayList<>();
+        this.excluding = new ArrayList<>();
         this.slicings = project.container(SlicingExtension.class);
     }
 
-    public boolean isNoJars() {
-        return this.noJars;
-    }
-
-    public void setNoJars(final boolean noJars) {
-        this.noJars = noJars;
-    }
-
-    public String getIncluding() {
+    // note: don't use getters here since they would be accessible from the gradle build file
+    List<String> including() {
         return this.including;
     }
 
-    public void setIncluding(final String including) {
-        this.including = including;
+    public void including(final String... includings) {
+        for (String including : includings) {
+            including().add(including);
+        }
     }
 
-    public String getExcluding() {
+    List<String> excluding() {
         return this.excluding;
     }
 
-    public void setExcluding(final String excluding) {
-        this.excluding = excluding;
+    public void excluding(final String... excludings) {
+        for (String excluding : excludings) {
+            excluding().add(excluding);
+        }
     }
 
-    public File getPrintTo() {
+    File printTo() {
         return this.printTo;
     }
 
-    public void setPrintTo(final File printTo) {
+    public void printTo(final File printTo) {
         this.printTo = printTo;
     }
 
-    public File getPrintOnFailure() {
+    File printOnFailure() {
         return this.printOnFailure;
     }
 
-    public void setPrintOnFailure(final File printOnFailure) {
+    public void printOnFailure(final File printOnFailure) {
         this.printOnFailure = printOnFailure;
     }
 
-    public NamedDomainObjectContainer<SlicingExtension> getSlicings() {
+    NamedDomainObjectContainer<SlicingExtension> slicings() {
         return this.slicings;
     }
 

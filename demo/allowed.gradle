@@ -1,0 +1,14 @@
+plugins {
+    id 'de.obqo.gradle.degraph'
+}
+
+degraph {
+    including 'demo.other.**'
+    slicings {
+        module {
+            patterns namedPattern('XX', 'demo.other.x.**'), namedPattern('YY', 'demo.other.y.**'), namedPattern('ZZ', 'demo.other.z.**')
+            allow anyOf('XX', 'YY'), 'ZZ'
+        }
+    }
+    printTo file("$buildDir/reports/degraph/allowed.graphml")
+}

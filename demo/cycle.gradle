@@ -10,10 +10,10 @@
 //apply plugin: 'de.obqo.gradle.degraph'
 
 plugins {
-    id 'de.obqo.gradle.degraph' version '0.1.4.0-SNAPSHOT'
+    id 'de.obqo.gradle.degraph'
 }
 
 degraph {
-    including = 'demo.cycle.**'
-    printOnFailure = file("$buildDir/reports/degraph/cycle.graphml")
+    including 'demo.cycle.**'
+    printOnFailure file("$buildDir/reports/degraph/cycle.graphml")
 }

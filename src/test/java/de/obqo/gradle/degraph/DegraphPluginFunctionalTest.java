@@ -52,6 +52,16 @@ public class DegraphPluginFunctionalTest {
     }
 
     @Test
+    public void shouldFailBecauseOfCyclesWithDefaultConfiguration() throws Exception {
+        execute("default.gradle", TaskOutcome.FAILED);
+    }
+
+    @Test
+    public void shouldSucceedWithSlicings() throws Exception {
+        execute("allowed.gradle", TaskOutcome.SUCCESS);
+    }
+
+    @Test
     public void shouldFailBecauseOfDisallowedSlices() throws Exception {
         execute("disallowed.gradle", TaskOutcome.FAILED);
     }

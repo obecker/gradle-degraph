@@ -1,18 +1,14 @@
 plugins {
-    id 'de.obqo.gradle.degraph' version '0.1.4.0-SNAPSHOT'
+    id 'de.obqo.gradle.degraph'
 }
 
 degraph {
-    noJars = true
-    including = 'demo.other.**'
+    including 'demo.other.**'
     slicings {
         module {
-            patterns = ['demo.other.(*).**']
-            allow {
-                direct = true
-                slices = ['x', 'y', 'z']
-            }
+            patterns 'demo.other.(*).**'
+            allowDirect 'x', 'y', 'z'
         }
     }
-    printTo = file("$buildDir/reports/degraph/disallowed.graphml")
+    printTo file("$buildDir/reports/degraph/disallowed.graphml")
 }

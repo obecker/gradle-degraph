@@ -1,9 +1,8 @@
 plugins {
-    id 'de.obqo.gradle.degraph' version '0.1.4.0-SNAPSHOT'
+    id 'de.obqo.gradle.degraph'
 }
 
 degraph {
-    noJars = true
-    including = 'demo.other.**'
-    printTo = file("$buildDir/reports/degraph/success.graphml")
+    excluding 'demo.cycle.**'
+    printTo file("$buildDir/reports/degraph/success.graphml")
 }

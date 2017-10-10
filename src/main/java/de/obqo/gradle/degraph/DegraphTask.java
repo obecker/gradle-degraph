@@ -1,7 +1,6 @@
 package de.obqo.gradle.degraph;
 
 import java.io.File;
-import java.util.List;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -37,19 +36,15 @@ public class DegraphTask extends DefaultTask {
     public void runConstraintCheck() {
         ConstraintBuilder constraint = customClasspath(this.classpath.getAsPath());
 
-        if (this.extension.isNoJars()) {
-            constraint = constraint.noJars();
+        for (String including : this.extension.including()) {
+            constraint = constraint.including(including);
         }
 
-        if (this.extension.getIncluding() != null) {
-            constraint = constraint.including(this.extension.getIncluding());
+        for (String excluding : this.extension.excluding()) {
+            constraint = constraint.excluding(excluding);
         }
 
-        if (this.extension.getExcluding() != null) {
-            constraint = constraint.excluding(this.extension.getExcluding());
-        }
-
-        final File printTo = this.extension.getPrintTo();
+        final File printTo = this.extension.printTo();
         if (printTo != null) {
             final File parent = printTo.getParentFile();
             if (parent != null) {
@@ -58,7 +53,7 @@ public class DegraphTask extends DefaultTask {
             constraint = constraint.printTo(printTo.getPath());
         }
 
-        final File printOnFailure = this.extension.getPrintOnFailure();
+        final File printOnFailure = this.extension.printOnFailure();
         if (printOnFailure != null) {
             final File parent = printOnFailure.getParentFile();
             if (parent != null) {
@@ -67,13 +62,10 @@ public class DegraphTask extends DefaultTask {
             constraint = constraint.printOnFailure(printOnFailure.getPath());
         }
 
-        for (SlicingExtension slicing : this.extension.getSlicings()) {
-            constraint = constraint.withSlicing(slicing.getName(), slicing.getPatterns().toArray());
-            final AllowExtension allow = slicing.getAllow();
-            final List<Object> slices = allow.getSlices();
-            if (!slices.isEmpty()) {
-                final Object[] slicesArray = slices.toArray();
-                constraint = allow.isDirect() ? constraint.allowDirect(slicesArray) : constraint.allow(slicesArray);
+        for (SlicingExtension slicing : this.extension.slicings()) {
+            constraint = constraint.withSlicing(slicing.sliceType(), slicing.patterns().toArray());
+            for (Allow allow : slicing.allows()) {
+                constraint = allow.isDirect() ? constraint.allowDirect(allow.getSlices()) : constraint.allow(allow.getSlices());
             }
         }
 
