@@ -1,14 +1,16 @@
 package de.obqo.gradle.degraph;
 
 /**
+ * Configuration model for {@code allow} constraints
+ *
  * @author Oliver Becker
  */
-class Allow {
+class AllowConfiguration {
 
     private final boolean direct;
     private final Object[] slices;
 
-    Allow(final boolean direct, final Object[] slices) {
+    AllowConfiguration(final boolean direct, final Object[] slices) {
         this.direct = direct;
         this.slices = slices;
     }

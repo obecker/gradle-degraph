@@ -1,66 +1,62 @@
 package de.obqo.gradle.degraph;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.gradle.api.GradleException;
 
 import de.schauderhaft.degraph.check.JLayer;
+import de.schauderhaft.degraph.check.Layer;
 import de.schauderhaft.degraph.configuration.NamedPattern;
 
 /**
+ * Extension class for the configuration of slicings
+ *
  * @author Oliver Becker
  */
 public class SlicingExtension {
 
-    // NamedDomainObjectContainer must have a name property - here the name represents the sliceType
+    // a NamedDomainObjectContainer can only contain objects having a name property - the name will be used as sliceType
     private final String name;
-
-    private final List<Object> patterns;
-    private final List<Allow> allows;
+    private final SlicingConfiguration configuration;
 
     public SlicingExtension(final String name) {
         this.name = name;
-        this.patterns = new ArrayList<>();
-        this.allows = new ArrayList<>();
+        this.configuration = new SlicingConfiguration(name);
     }
 
-    // note: don't use getters here since they would be accessible from the gradle build file
-    String sliceType() {
-        return this.name;
-    }
-
-    List<Object> patterns() {
-        return this.patterns;
+    // use leading underscore to prevent access from the gradle build file
+    SlicingConfiguration _configuration() {
+        return this.configuration;
     }
 
     public void patterns(Object... patterns) {
         for (Object pattern : patterns) {
             if (!(pattern instanceof String || pattern instanceof NamedPattern)) {
-                throw new GradleException(
-                        String.format("degraph: patterns must be strings or namedPattern(string), found '%s'", pattern));
+                throw new GradleException(String.format(
+                        "degraph: patterns must be strings or namedPattern(string), found '%s'",
+                        pattern));
             }
+            this.configuration.addPattern(pattern);
         }
-        patterns().addAll(Arrays.asList(patterns));
-    }
-
-    List<Allow> allows() {
-        return this.allows;
     }
 
     public void allow(final Object... slices) {
-        if (slices == null) {
-            throw new GradleException("degraph: Missing slices after allow");
-        }
-        allows().add(new Allow(false, slices));
+        checkSlices("allow", slices);
+        this.configuration.addAllow(false, slices);
     }
 
     public void allowDirect(final Object... slices) {
-        if (slices == null) {
-            throw new GradleException("degraph: Missing slices after allowDirect");
+        checkSlices("allowDirect", slices);
+        this.configuration.addAllow(true, slices);
+    }
+
+    private void checkSlices(final String prop, final Object[] slices) {
+        for (Object slice : slices) {
+            if (!(slice instanceof String || slice instanceof Layer)) {
+                throw new GradleException(String.format(
+                        "degraph: slices after %s must be strings, oneOf(strings), or anyOf(strings), found '%s'",
+                        prop,
+                        slice));
+            }
         }
-        allows().add(new Allow(true, slices));
     }
 
     public Object namedPattern(final String name, final String pattern) {

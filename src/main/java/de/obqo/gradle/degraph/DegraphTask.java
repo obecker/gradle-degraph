@@ -19,13 +19,13 @@ import static de.schauderhaft.degraph.check.Check.violationFree;
  */
 public class DegraphTask extends DefaultTask {
 
-    private DegraphExtension extension;
+    private DegraphConfiguration configuration;
 
     @InputFiles
     private FileCollection classpath;
 
-    void setExtension(final DegraphExtension extension) {
-        this.extension = extension;
+    void setConfiguration(final DegraphConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     void setClasspath(final FileCollection classpath) {
@@ -36,15 +36,15 @@ public class DegraphTask extends DefaultTask {
     public void runConstraintCheck() {
         ConstraintBuilder constraint = customClasspath(this.classpath.getAsPath());
 
-        for (String including : this.extension.including()) {
+        for (String including : this.configuration.getIncludings()) {
             constraint = constraint.including(including);
         }
 
-        for (String excluding : this.extension.excluding()) {
+        for (String excluding : this.configuration.getExcludings()) {
             constraint = constraint.excluding(excluding);
         }
 
-        final File printTo = this.extension.printTo();
+        final File printTo = this.configuration.getPrintTo();
         if (printTo != null) {
             final File parent = printTo.getParentFile();
             if (parent != null) {
@@ -53,7 +53,7 @@ public class DegraphTask extends DefaultTask {
             constraint = constraint.printTo(printTo.getPath());
         }
 
-        final File printOnFailure = this.extension.printOnFailure();
+        final File printOnFailure = this.configuration.getPrintOnFailure();
         if (printOnFailure != null) {
             final File parent = printOnFailure.getParentFile();
             if (parent != null) {
@@ -62,9 +62,9 @@ public class DegraphTask extends DefaultTask {
             constraint = constraint.printOnFailure(printOnFailure.getPath());
         }
 
-        for (SlicingExtension slicing : this.extension.slicings()) {
-            constraint = constraint.withSlicing(slicing.sliceType(), slicing.patterns().toArray());
-            for (Allow allow : slicing.allows()) {
+        for (SlicingConfiguration slicing : this.configuration.getSlicings()) {
+            constraint = constraint.withSlicing(slicing.getSliceType(), slicing.getPatterns().toArray());
+            for (AllowConfiguration allow : slicing.getAllows()) {
                 constraint = allow.isDirect() ? constraint.allowDirect(allow.getSlices()) : constraint.allow(allow.getSlices());
             }
         }

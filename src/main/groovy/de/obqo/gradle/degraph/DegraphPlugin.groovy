@@ -19,7 +19,9 @@ class DegraphPlugin implements Plugin<Project> {
         degraphTask.description = "Checks the java sources for package cycles and other custom constraints"
         degraphTask.group = JavaBasePlugin.VERIFICATION_GROUP
 
-        degraphTask.extension = project.extensions.create(TASK_NAME, DegraphExtension, project)
+        final DegraphConfiguration configuration = new DegraphConfiguration()
+        project.extensions.create(TASK_NAME, DegraphExtension, project, configuration)
+        degraphTask.configuration = configuration
 
         project.afterEvaluate {
             // make task check depend on degraph
