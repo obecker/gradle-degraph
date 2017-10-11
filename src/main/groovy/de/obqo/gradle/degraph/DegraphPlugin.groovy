@@ -26,14 +26,22 @@ class DegraphPlugin implements Plugin<Project> {
         project.afterEvaluate {
             // make task check depend on degraph
             project.tasks
-                    .matching { task -> task.name.equals(JavaBasePlugin.CHECK_TASK_NAME) }
-                    .all { task -> task.dependsOn degraphTask }
+                    .matching { it.name.equals JavaBasePlugin.CHECK_TASK_NAME }
+                    .all { it.dependsOn degraphTask }
             // make task degraph depend on compileJava (because it uses the classpath, see below)
             project.tasks
-                    .matching { task -> task.name.equals("compileJava") }
-                    .all { task -> degraphTask.dependsOn task }
+                    .matching { it.name.equals "compileJava" }
+                    .all { degraphTask.dependsOn it }
 
-            degraphTask.classpath = project.sourceSets.main.output
+            // configure classpath for degraph (default: output of all source sets)
+            def sources = configuration.sourceSets
+            if (sources.empty) {
+                sources = project.sourceSets.asMap.values()
+            }
+
+            degraphTask.classpath = sources
+                    .collect { it.output }
+                    .inject { classpath, output -> classpath + output }
         }
     }
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
+import org.gradle.api.tasks.SourceSet;
 
 /**
  * Extension class for the configuration of degraph
@@ -24,6 +25,12 @@ public class DegraphExtension {
         configuration.setSlicingsSupplier(() -> this.slicings.stream()
                 .map(SlicingExtension::_configuration)
                 .collect(Collectors.toList()));
+    }
+
+    public void sourceSets(final SourceSet... sourceSets) {
+        for (SourceSet sourceSet : sourceSets) {
+            this.configuration.addSourceSet(sourceSet);
+        }
     }
 
     public void including(final String... includings) {

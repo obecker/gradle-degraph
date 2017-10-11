@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.gradle.api.tasks.SourceSet;
+
 /**
  * Configuration model for {@code degraph}
  *
@@ -13,12 +15,21 @@ import java.util.function.Supplier;
  */
 class DegraphConfiguration {
 
+    private final List<SourceSet> sourceSets = new ArrayList<>();
     private final List<String> includings = new ArrayList<>();
     private final List<String> excludings = new ArrayList<>();
     private File printTo;
     private File printOnFailure;
 
     private Supplier<Collection<SlicingConfiguration>> slicingsSupplier;
+
+    List<SourceSet> getSourceSets() {
+        return this.sourceSets;
+    }
+
+    void addSourceSet(final SourceSet sourceSet) {
+        this.sourceSets.add(sourceSet);
+    }
 
     List<String> getIncludings() {
         return this.includings;

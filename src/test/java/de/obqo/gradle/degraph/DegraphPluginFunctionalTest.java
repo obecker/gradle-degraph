@@ -66,6 +66,11 @@ public class DegraphPluginFunctionalTest {
         execute("disallowed.gradle", TaskOutcome.FAILED);
     }
 
+    @Test
+    public void shouldSucceedOnTestSources() throws Exception {
+        execute("testsources.gradle", TaskOutcome.SUCCESS);
+    }
+
     private void execute(final String buildFile, final TaskOutcome taskOutcome) {
         final GradleRunner gradleRunner = GradleRunner.create()
                 .withProjectDir(new File("demo"))
