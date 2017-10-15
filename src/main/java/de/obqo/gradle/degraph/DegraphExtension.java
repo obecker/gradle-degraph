@@ -1,8 +1,5 @@
 package de.obqo.gradle.degraph;
 
-import java.io.File;
-import java.util.stream.Collectors;
-
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
@@ -19,12 +16,10 @@ public class DegraphExtension {
     private final DegraphConfiguration configuration;
 
     public DegraphExtension(final Project project, final DegraphConfiguration configuration) {
-        this.slicings = project.container(SlicingExtension.class);
+        this.slicings = project.container(
+                SlicingExtension.class,
+                sliceType -> new SlicingExtension(configuration.addSlicing(sliceType)));
         this.configuration = configuration;
-
-        configuration.setSlicingsSupplier(() -> this.slicings.stream()
-                .map(SlicingExtension::_configuration)
-                .collect(Collectors.toList()));
     }
 
     public void sourceSets(final SourceSet... sourceSets) {
@@ -43,14 +38,6 @@ public class DegraphExtension {
         for (String excluding : excludings) {
             this.configuration.addExcluding(excluding);
         }
-    }
-
-    public void printTo(final File printTo) {
-        this.configuration.setPrintTo(printTo);
-    }
-
-    public void printOnFailure(final File printOnFailure) {
-        this.configuration.setPrintOnFailure(printOnFailure);
     }
 
     public void slicings(final Action<NamedDomainObjectContainer<SlicingExtension>> action) {

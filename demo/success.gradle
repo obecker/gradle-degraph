@@ -4,5 +4,4 @@ plugins {
 
 degraph {
     excluding 'demo.cycle.**'
-    printTo file("$buildDir/reports/degraph/success.graphml")
 }

@@ -10,5 +10,4 @@ degraph {
             allow anyOf('XX', 'YY'), 'ZZ'
         }
     }
-    printTo file("$buildDir/reports/degraph/allowed.graphml")
 }

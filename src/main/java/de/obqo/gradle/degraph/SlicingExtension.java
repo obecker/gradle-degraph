@@ -17,14 +17,9 @@ public class SlicingExtension {
     private final String name;
     private final SlicingConfiguration configuration;
 
-    public SlicingExtension(final String name) {
-        this.name = name;
-        this.configuration = new SlicingConfiguration(name);
-    }
-
-    // use leading underscore to prevent access from the gradle build file
-    SlicingConfiguration _configuration() {
-        return this.configuration;
+    SlicingExtension(final SlicingConfiguration configuration) {
+        this.name = configuration.getSliceType();
+        this.configuration = configuration;
     }
 
     public void patterns(Object... patterns) {

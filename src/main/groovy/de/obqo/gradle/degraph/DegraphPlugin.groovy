@@ -15,7 +15,7 @@ class DegraphPlugin implements Plugin<Project> {
     void apply(final Project project) {
         project.apply plugin: 'java'
 
-        final DegraphTask degraphTask = project.tasks.create(TASK_NAME, DegraphTask);
+        final DegraphTask degraphTask = project.tasks.create(TASK_NAME, DegraphTask)
         degraphTask.description = "Checks the java sources for package cycles and other custom constraints"
         degraphTask.group = JavaBasePlugin.VERIFICATION_GROUP
 
@@ -24,6 +24,8 @@ class DegraphPlugin implements Plugin<Project> {
         degraphTask.configuration = configuration
 
         project.afterEvaluate {
+            degraphTask.reportFile = new File(project.buildDir, "reports/degraph/result.graphml")
+
             // configure classpath for degraph (default: output of all source sets)
             def sources = configuration.sourceSets
             if (sources.empty) {

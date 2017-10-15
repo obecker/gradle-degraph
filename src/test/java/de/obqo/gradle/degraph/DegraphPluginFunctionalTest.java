@@ -71,18 +71,45 @@ public class DegraphPluginFunctionalTest {
         execute("testsources.gradle", TaskOutcome.SUCCESS);
     }
 
-    private void execute(final String buildFile, final TaskOutcome taskOutcome) {
-        final GradleRunner gradleRunner = GradleRunner.create()
-                .withProjectDir(new File("demo"))
-                .withPluginClasspath(this.pluginClasspath)
-                .withArguments("-b", buildFile, "degraph", "--info")
+    private void execute(final String buildFile, final TaskOutcome expectedOutcome) {
+        final GradleRunner gradleRunner = buildGradleRunner()
+                .withArguments("-b", buildFile, "degraph", "--info", "--rerun-tasks")
                 .withDebug(true);
-        final BuildResult buildResult = taskOutcome == TaskOutcome.SUCCESS ? gradleRunner.build() : gradleRunner.buildAndFail();
+        final BuildResult buildResult = expectedOutcome == TaskOutcome.SUCCESS
+                ? gradleRunner.build()
+                : gradleRunner.buildAndFail();
 
+        assertBuildResult(buildResult, expectedOutcome);
+    }
+
+    private GradleRunner buildGradleRunner() {
+        return GradleRunner.create()
+                .withProjectDir(new File("demo"))
+                .withPluginClasspath(this.pluginClasspath);
+    }
+
+    private void assertBuildResult(final BuildResult buildResult, final TaskOutcome expectedOutcome) {
         System.out.println(buildResult.getOutput());
 
         final BuildTask degraphTask = buildResult.task(":degraph");
         assertThat(degraphTask, is(notNullValue()));
-        assertThat(degraphTask.getOutcome(), is(taskOutcome));
+        assertThat(degraphTask.getOutcome(), is(expectedOutcome));
+    }
+
+    @Test
+    public void shouldCachePreviousRun() throws Exception {
+        // first run
+        final BuildResult successResult = buildGradleRunner()
+                .withArguments("-b", "success.gradle", "degraph", "--info", "--rerun-tasks")
+                .withDebug(true)
+                .build();
+        assertBuildResult(successResult, TaskOutcome.SUCCESS);
+
+        // second run
+        final BuildResult upToDateResult = buildGradleRunner()
+                .withArguments("-b", "success.gradle", "degraph", "--info")
+                .withDebug(true)
+                .build();
+        assertBuildResult(upToDateResult, TaskOutcome.UP_TO_DATE);
     }
 }

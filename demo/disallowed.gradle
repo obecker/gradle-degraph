@@ -10,5 +10,4 @@ degraph {
             allowDirect 'x', 'y', 'z'
         }
     }
-    printTo file("$buildDir/reports/degraph/disallowed.graphml")
 }

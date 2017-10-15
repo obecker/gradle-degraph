@@ -1,11 +1,13 @@
 package de.obqo.gradle.degraph;
 
+import java.io.Serializable;
+
 /**
  * Configuration model for {@code allow} constraints
  *
  * @author Oliver Becker
  */
-class AllowConfiguration {
+class AllowConfiguration implements Serializable {
 
     private final boolean direct;
     private final Object[] slices;

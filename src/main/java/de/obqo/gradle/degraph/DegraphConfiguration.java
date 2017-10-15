@@ -1,10 +1,8 @@
 package de.obqo.gradle.degraph;
 
-import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.gradle.api.tasks.SourceSet;
 
@@ -13,15 +11,12 @@ import org.gradle.api.tasks.SourceSet;
  *
  * @author Oliver Becker
  */
-class DegraphConfiguration {
+class DegraphConfiguration implements Serializable {
 
-    private final List<SourceSet> sourceSets = new ArrayList<>();
+    private transient final List<SourceSet> sourceSets = new ArrayList<>();
     private final List<String> includings = new ArrayList<>();
     private final List<String> excludings = new ArrayList<>();
-    private File printTo;
-    private File printOnFailure;
-
-    private Supplier<Collection<SlicingConfiguration>> slicingsSupplier;
+    private final List<SlicingConfiguration> slicings = new ArrayList<>();
 
     List<SourceSet> getSourceSets() {
         return this.sourceSets;
@@ -47,27 +42,13 @@ class DegraphConfiguration {
         this.excludings.add(excluding);
     }
 
-    File getPrintTo() {
-        return this.printTo;
+    SlicingConfiguration addSlicing(final String sliceType) {
+        final SlicingConfiguration slicing = new SlicingConfiguration(sliceType);
+        this.slicings.add(slicing);
+        return slicing;
     }
 
-    void setPrintTo(final File printTo) {
-        this.printTo = printTo;
-    }
-
-    File getPrintOnFailure() {
-        return this.printOnFailure;
-    }
-
-    void setPrintOnFailure(final File printOnFailure) {
-        this.printOnFailure = printOnFailure;
-    }
-
-    void setSlicingsSupplier(final Supplier<Collection<SlicingConfiguration>> slicingsSupplier) {
-        this.slicingsSupplier = slicingsSupplier;
-    }
-
-    Collection<SlicingConfiguration> getSlicings() {
-        return this.slicingsSupplier.get();
+    List<SlicingConfiguration> getSlicings() {
+        return this.slicings;
     }
 }

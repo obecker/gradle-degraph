@@ -1,5 +1,6 @@
 package de.obqo.gradle.degraph;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  *
  * @author Oliver Becker
  */
-class SlicingConfiguration {
+class SlicingConfiguration implements Serializable {
 
     private final String sliceType;
     private final List<Object> patterns;

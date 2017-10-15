@@ -15,5 +15,4 @@ plugins {
 
 degraph {
     including 'demo.cycle.**'
-    printOnFailure file("$buildDir/reports/degraph/cycle.graphml")
 }
