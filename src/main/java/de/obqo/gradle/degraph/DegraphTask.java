@@ -6,9 +6,11 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
 import org.scalatest.matchers.MatchResult;
 
@@ -42,7 +44,9 @@ public class DegraphTask extends DefaultTask {
         this.classpath = classpath;
     }
 
-    @InputFiles
+    @SkipWhenEmpty
+    @Classpath
+    @InputFiles // for pre 3.2 gradle versions
     public FileCollection getClasspath() {
         return this.classpath;
     }
