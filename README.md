@@ -34,19 +34,29 @@ apply plugin: 'de.obqo.gradle.degraph'
 
 ## Running
 
-Run the `degraph` task using
+The plugin creates for each source set a corresponding <code>degraph<i>SourceSetName</i></code> task. 
+Additionally there is one `degraph` task that runs all these source set specific tasks. 
+
+You can run a single degraph check (for example for the `main` source set) with
+
+```
+gradle degraphMain
+```
+
+You can run all degraph checks with
 
 ```
 gradle degraph
 ```
 
-It has a dependency on the `check` task, so it will be executed together with other verification tasks if you run
+The `degraph` task has a dependency on the `check` task, so it will be executed together with other verification tasks if you run
 
 ```
 gradle check
 ```
 
-The result of the `degraph` task will be written to `$buildDir/reports/degraph/result.graphml` in the
+The result of each source set specific degraph task will be written to a corresponding file <code>$buildDir/reports/degraph/<i>name</i>.graphml</code> 
+(where <i>name</i> is the name of the source set) in the
 [GraphML format](https://en.wikipedia.org/wiki/GraphML).
 
 ## Configuration
@@ -79,9 +89,8 @@ So you have to use `sourceSets ...` or even `sourceSets(...)` instead of `source
 
 * `sourceSets`
   defines the source sets that should be analyzed. 
-  By default all source sets defined in the gradle build file are included.
-  That means this option is most useful if you only want a subset of the source sets to be processed.
-  Degraph will perform an overall analysis with the united output of all source sets.
+  By default all source sets defined in the gradle build file are considered.
+  That means this option is most useful if you only want a subset of the source sets to be checked.
 
 * `including`
   defines ant style string patterns for the classes that should be included (default: all) 
@@ -129,7 +138,8 @@ degraph {
             patterns 'de.schauderhaft.(*).**'
         }
         layer {
-            patterns namedPattern('persistence', 'de.schauderhaft.legacy.db.**'), 'de.schauderhaft.*.(*).**'
+            patterns(namedPattern('persistence', 'de.schauderhaft.legacy.db.**'), 
+                     'de.schauderhaft.*.(*).**')
         }
     }
 }

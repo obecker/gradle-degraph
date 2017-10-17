@@ -1,6 +1,7 @@
 package de.obqo.gradle.degraph;
 
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class DegraphPluginUnitTest {
         Project project = ProjectBuilder.builder().build();
         project.getPluginManager().apply("de.obqo.gradle.degraph");
 
-        assertThat(project.getTasks().getByName("degraph"), is(instanceOf(DegraphTask.class)));
+        assertThat(project.getTasks().getByName("degraph"), is(instanceOf(Task.class)));
         assertThat(project.getExtensions().getByName("degraph"), is(instanceOf(DegraphExtension.class)));
     }
 }

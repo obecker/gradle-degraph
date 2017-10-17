@@ -1,0 +1,11 @@
+plugins {
+    id 'de.obqo.gradle.degraph'
+}
+
+sourceSets {
+    shared
+}
+
+degraph {
+    excluding 'demo.cycle.**'
+}
