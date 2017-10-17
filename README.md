@@ -9,27 +9,14 @@ The latest version uses Degraph 0.1.4
 
 ## Installation
 
-There is no release of this plugin yet.
+The plugin has been released on the [Gradle Plugin Repository](https://plugins.gradle.org/plugin/de.obqo.gradle.degraph).
+The latest version is 0.1.4.0.
 
-However, you can clone this repository and install the plugin locally like this:
-
+To use the plugin in your own project just add the following to your `build.gradle`:
 ```
-gradlew publishToMavenLocal
-```
-
-Then add the following configuration to your project's `build.gradle`:
-```groovy
-buildscript {
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-    dependencies {
-        classpath 'de.obqo.gradle:gradle-degraph:0.1.4.0-SNAPSHOT'
-    }
+plugins {
+  id "de.obqo.gradle.degraph" version "0.1.4.0"
 }
-
-apply plugin: 'de.obqo.gradle.degraph'
 ```
 
 ## Running
@@ -161,6 +148,29 @@ degraph {
         }
     }
 }
+```
+
+## Building
+
+After cloning this repository you can build and deploy a version of the gradle degraph plugin to your local maven repository by running
+
+```
+gradlew build publishToMavenLocal
+```
+
+Then add the following configuration to your project's `build.gradle`:
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'de.obqo.gradle:gradle-degraph:0.1.4.0'
+    }
+}
+
+apply plugin: 'de.obqo.gradle.degraph'
 ```
 
 ## License

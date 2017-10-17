@@ -1,7 +1,8 @@
 plugins {
+    id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'groovy'
+    id "com.gradle.plugin-publish" version "0.9.8"
 }
 
 ext {
@@ -9,11 +10,12 @@ ext {
 }
 
 group 'de.obqo.gradle'
-version "${degraphVersion}.0-SNAPSHOT"
+version "${degraphVersion}.0"
 
 sourceCompatibility = 1.8
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -44,6 +46,20 @@ gradlePlugin {
         degraphPlugin {
             id = 'de.obqo.gradle.degraph'
             implementationClass = 'de.obqo.gradle.degraph.DegraphPlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/obecker/gradle-degraph'
+    vcsUrl = 'https://github.com/obecker/gradle-degraph'
+
+    plugins {
+        degraphPlugin {
+            id = 'de.obqo.gradle.degraph'
+            displayName = 'Gradle Degraph Plugin'
+            description = 'Gradle plugin that executes degraph dependency checks'
+            tags = ['degraph', 'code-quality']
         }
     }
 }
