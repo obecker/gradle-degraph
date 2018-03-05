@@ -2,22 +2,18 @@ package de.obqo.gradle.degraph;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
-import org.scalatest.matchers.MatchResult;
-
-import de.schauderhaft.degraph.check.ConstraintBuilder;
-
-import static de.schauderhaft.degraph.check.Check.customClasspath;
-import static de.schauderhaft.degraph.check.Check.violationFree;
+import org.gradle.workers.IsolationMode;
+import org.gradle.workers.WorkerExecutor;
 
 /**
  * @author Oliver Becker
@@ -25,11 +21,20 @@ import static de.schauderhaft.degraph.check.Check.violationFree;
 @CacheableTask
 public class DegraphTask extends DefaultTask {
 
+    private final WorkerExecutor workerExecutor;
+
     private DegraphConfiguration configuration;
 
     private FileCollection classpath;
 
+    private FileCollection workerClasspath;
+
     private File reportFile;
+
+    @Inject
+    public DegraphTask(final WorkerExecutor workerExecutor) {
+        this.workerExecutor = workerExecutor;
+    }
 
     void setConfiguration(final DegraphConfiguration configuration) {
         this.configuration = configuration;
@@ -44,9 +49,12 @@ public class DegraphTask extends DefaultTask {
         this.classpath = classpath;
     }
 
+    void setWorkerClasspath(final FileCollection workerClasspath) {
+        this.workerClasspath = workerClasspath;
+    }
+
     @SkipWhenEmpty
     @Classpath
-    @InputFiles // for pre 3.2 gradle versions
     public FileCollection getClasspath() {
         return this.classpath;
     }
@@ -62,35 +70,15 @@ public class DegraphTask extends DefaultTask {
 
     @TaskAction
     public void runConstraintCheck() {
-        ConstraintBuilder constraint = customClasspath(this.classpath.getAsPath());
+        final DegraphConfiguration degraphConfiguration = this.configuration;
+        final String classpath = this.classpath.getAsPath();
+        final File reportFile = this.reportFile;
+        final FileCollection workerClasspath = this.workerClasspath;
 
-        for (String including : this.configuration.getIncludings()) {
-            constraint = constraint.including(including);
-        }
-
-        for (String excluding : this.configuration.getExcludings()) {
-            constraint = constraint.excluding(excluding);
-        }
-
-        for (SlicingConfiguration slicing : this.configuration.getSlicings()) {
-            constraint = constraint.withSlicing(slicing.getSliceType(), slicing.getPatterns().toArray());
-            for (AllowConfiguration allow : slicing.getAllows()) {
-                constraint = allow.isDirect() ? constraint.allowDirect(allow.getSlices()) : constraint.allow(allow.getSlices());
-            }
-        }
-
-        this.reportFile.getParentFile().mkdirs();
-        constraint = constraint.printTo(this.reportFile.getPath());
-
-        getLogger().info("degraph constraints: {}", constraint);
-
-        final MatchResult result = violationFree().apply(constraint);
-
-        getLogger().debug("degraph result: {}", result);
-
-        if (!result.matches()) {
-            throw new GradleException(
-                    String.format("%s\n\nSee the report at: %s", result.rawFailureMessage(), this.reportFile));
-        }
+        this.workerExecutor.submit(DegraphWorker.class, workerConfiguration -> {
+            workerConfiguration.setIsolationMode(IsolationMode.CLASSLOADER);
+            workerConfiguration.classpath(workerClasspath);
+            workerConfiguration.params(degraphConfiguration, classpath, reportFile);
+        });
     }
 }

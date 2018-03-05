@@ -43,4 +43,8 @@ public class DegraphExtension {
     public void slicings(final Action<NamedDomainObjectContainer<SlicingExtension>> action) {
         action.execute(this.slicings);
     }
+
+    public void toolVersion(final String version) {
+        this.configuration.setToolVersion(version);
+    }
 }

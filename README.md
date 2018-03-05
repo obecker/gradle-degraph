@@ -10,12 +10,12 @@ The latest version uses Degraph 0.1.4
 ## Installation
 
 The plugin has been released on the [Gradle Plugin Repository](https://plugins.gradle.org/plugin/de.obqo.gradle.degraph).
-The latest version is 0.1.4.0.
+The latest version is 0.1.4.1 and requires at least Gradle version 4.1.
 
 To use the plugin in your own project just add the following to your `build.gradle`:
 ```
 plugins {
-  id "de.obqo.gradle.degraph" version "0.1.4.0"
+  id "de.obqo.gradle.degraph" version "0.1.4.1"
 }
 ```
 
@@ -55,6 +55,7 @@ All configuration settings are optional.
 
 <pre>
 <b>degraph</b> {
+    <b>toolVersion</b> '0.1.4'
     <b>sourceSets</b> sourceSets.main, sourceSets.test, ...
     <b>including</b> 'org.example.includes.**', ...
     <b>excluding</b> 'org.example.excludes.**', ...
@@ -72,8 +73,11 @@ All configuration settings are optional.
 </pre>
 
 (_Note_: technically all configuration settings are method calls and no property assignments. 
-So you have to use `sourceSets ...` or even `sourceSets(...)` instead of `sourceSets = ...`)
+So you have to use `toolVersion ...` or even `toolVersion(...)` instead of `toolVersion = ...`)
 
+* `toolVersion`
+  defines the version of degraph to be used. The default value is `'0.1.4'`
+  (Note: newer versions of degraph have to be API compatible with version 0.1.4 for this to work)
 * `sourceSets`
   defines the source sets that should be analyzed. 
   By default all source sets defined in the gradle build file are considered.
@@ -166,7 +170,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'de.obqo.gradle:gradle-degraph:0.1.4.0'
+        classpath 'de.obqo.gradle:gradle-degraph:0.1.4.1'
     }
 }
 
