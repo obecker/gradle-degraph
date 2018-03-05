@@ -2,7 +2,7 @@ plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id "com.gradle.plugin-publish" version "0.9.8"
+    id "com.gradle.plugin-publish" version "0.9.10"
 }
 
 ext {
@@ -10,7 +10,7 @@ ext {
 }
 
 group 'de.obqo.gradle'
-version "${degraphVersion}.0"
+version "${degraphVersion}.1"
 
 sourceCompatibility = 1.8
 
@@ -33,20 +33,34 @@ task createClasspathManifest {
 }
 
 dependencies {
-    compile "de.schauderhaft.degraph:degraph-check:${degraphVersion}"
+    compileOnly "de.schauderhaft.degraph:degraph-check:${degraphVersion}"
+
+    // Work-around to prevent conflicting module version of groovy-all:
+    // Make the implicit (and incorrect) dependency to groovy-all explicit so the dependency conflict resolution
+    // will use this version of groovy (belonging to gradle 4.6) instead of an old one coming from an older gradle version.
+    // See also https://github.com/gradle/gradle/issues/3698, https://github.com/gradle/gradle/issues/1370
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
 
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'commons-io:commons-io:2.5'
     testRuntime files(createClasspathManifest)
 }
 
+def pluginId = 'de.obqo.gradle.degraph'
 gradlePlugin {
     plugins {
         degraphPlugin {
-            id = 'de.obqo.gradle.degraph'
+            id = pluginId
             implementationClass = 'de.obqo.gradle.degraph.DegraphPlugin'
         }
+    }
+}
+
+processResources {
+    doLast {
+        file("${buildDir}/resources/main/META-INF/gradle-plugins/${pluginId}.properties") << "default-tool-version=${degraphVersion}\n"
     }
 }
 

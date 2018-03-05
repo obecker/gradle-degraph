@@ -89,6 +89,12 @@ public class DegraphPluginFunctionalTest {
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphShared");
     }
 
+    @Test
+    public void shouldFailBecauseOfCyclesWithDifferentToolVersion() throws Exception {
+        BuildResult result = buildAndFail("toolversion.gradle");
+        assertBuildResult(result, TaskOutcome.FAILED, "degraphMain");
+    }
+
     private BuildResult build(final String buildFile) {
         return execute(buildFile, true);
     }
@@ -99,7 +105,7 @@ public class DegraphPluginFunctionalTest {
 
     private BuildResult execute(final String buildFile, final boolean expectSuccess) {
         final GradleRunner gradleRunner = buildGradleRunner()
-                .withArguments("-b", buildFile, "degraph", "--info", "--rerun-tasks")
+                .withArguments("-b", buildFile, "degraph", "--info", "--stacktrace", "--rerun-tasks")
                 .withDebug(true);
         return expectSuccess ? gradleRunner.build() : gradleRunner.buildAndFail();
     }
@@ -123,7 +129,7 @@ public class DegraphPluginFunctionalTest {
 
         // when first run
         final BuildResult successResult = buildGradleRunner()
-                .withArguments("-b", buildFile, "degraph", "--info", "--rerun-tasks")
+                .withArguments("-b", buildFile, "degraph", "--info", "--stacktrace", "--rerun-tasks")
                 .withDebug(true)
                 .build();
         // then
@@ -131,7 +137,7 @@ public class DegraphPluginFunctionalTest {
 
         // when second run
         final BuildResult upToDateResult = buildGradleRunner()
-                .withArguments("-b", buildFile, "degraph", "--info")
+                .withArguments("-b", buildFile, "degraph", "--info", "--stacktrace")
                 .withDebug(true)
                 .build();
         // then

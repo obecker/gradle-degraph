@@ -2,10 +2,6 @@ package de.obqo.gradle.degraph;
 
 import org.gradle.api.GradleException;
 
-import de.schauderhaft.degraph.check.JLayer;
-import de.schauderhaft.degraph.check.Layer;
-import de.schauderhaft.degraph.configuration.NamedPattern;
-
 /**
  * Extension class for the configuration of slicings
  *
@@ -24,7 +20,7 @@ public class SlicingExtension {
 
     public void patterns(Object... patterns) {
         for (Object pattern : patterns) {
-            if (!(pattern instanceof String || pattern instanceof NamedPattern)) {
+            if (!(pattern instanceof String || pattern instanceof NamedPatternConfig)) {
                 throw new GradleException(String.format(
                         "degraph: patterns must be strings or namedPattern(string), found '%s'",
                         pattern));
@@ -45,7 +41,7 @@ public class SlicingExtension {
 
     private void checkSlices(final String prop, final Object[] slices) {
         for (Object slice : slices) {
-            if (!(slice instanceof String || slice instanceof Layer)) {
+            if (!(slice instanceof String || slice instanceof LayerConfig)) {
                 throw new GradleException(String.format(
                         "degraph: slices after %s must be strings, oneOf(strings), or anyOf(strings), found '%s'",
                         prop,
@@ -58,15 +54,14 @@ public class SlicingExtension {
         if (name.contains("*") || name.contains(".")) {
             throw new GradleException(String.format("degraph: illegal pattern name '%s' - must contain neither * nor .", name));
         }
-        // Note: in the helper function the name is the first argument, while in the NamedPattern constructor it is the second
-        return new NamedPattern(pattern, name);
+        return new NamedPatternConfig(name, pattern);
     }
 
     public Object oneOf(final String... slices) {
-        return JLayer.oneOf(slices);
+        return new LayerConfig(true, slices);
     }
 
     public Object anyOf(final String... slices) {
-        return JLayer.anyOf(slices);
+        return new LayerConfig(false, slices);
     }
 }

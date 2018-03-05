@@ -17,6 +17,7 @@ class DegraphConfiguration implements Serializable {
     private final List<String> includings = new ArrayList<>();
     private final List<String> excludings = new ArrayList<>();
     private final List<SlicingConfiguration> slicings = new ArrayList<>();
+    private String toolVersion;
 
     List<SourceSet> getSourceSets() {
         return this.sourceSets;
@@ -50,5 +51,13 @@ class DegraphConfiguration implements Serializable {
 
     List<SlicingConfiguration> getSlicings() {
         return this.slicings;
+    }
+
+    String getToolVersion() {
+        return this.toolVersion;
+    }
+
+    void setToolVersion(final String toolVersion) {
+        this.toolVersion = toolVersion;
     }
 }
