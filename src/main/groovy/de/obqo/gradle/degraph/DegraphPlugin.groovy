@@ -33,6 +33,7 @@ class DegraphPlugin implements Plugin<Project> {
         // create a new configuration that will be used by the plugin's worker
         final Configuration workerClasspath = project.configurations.create("degraph")
         project.repositories {
+            mavenLocal()
             mavenCentral()
         }
 
@@ -54,10 +55,10 @@ class DegraphPlugin implements Plugin<Project> {
                 DegraphTask degraphWorkTask = project.tasks.create(TASK_NAME + name.capitalize(), DegraphTask)
                 degraphWorkTask.description = "Checks the ${name} sources for package cycles and other custom constraints"
                 degraphWorkTask.group = JavaBasePlugin.VERIFICATION_GROUP
-                degraphWorkTask.configuration = configuration
-                degraphWorkTask.reportFile = new File(project.buildDir, "reports/degraph/${name}.graphml")
-                degraphWorkTask.classpath = source.output
-                degraphWorkTask.workerClasspath = workerClasspath
+                degraphWorkTask.configuration.set(configuration)
+                degraphWorkTask.reportFile.set(new File(project.buildDir, "reports/degraph/${name}.graphml"))
+                degraphWorkTask.classpath.set(source.output)
+                degraphWorkTask.workerClasspath.set(workerClasspath)
 
                 // set task dependencies, e.g. degraph -> degraphTest -> testClasses
                 degraphRunnerTask.dependsOn(degraphWorkTask.dependsOn(project.tasks[source.classesTaskName]))

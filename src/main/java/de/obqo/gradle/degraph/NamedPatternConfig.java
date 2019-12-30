@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 class NamedPatternConfig implements Serializable {
 
+    private static final long serialVersionUID = 10L;
+
     private final String name;
     private final String pattern;
 

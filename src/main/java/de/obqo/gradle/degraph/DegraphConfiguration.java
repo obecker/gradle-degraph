@@ -13,6 +13,8 @@ import org.gradle.api.tasks.SourceSet;
  */
 class DegraphConfiguration implements Serializable {
 
+    private static final long serialVersionUID = 10L;
+
     private transient final List<SourceSet> sourceSets = new ArrayList<>();
     private final List<String> includings = new ArrayList<>();
     private final List<String> excludings = new ArrayList<>();

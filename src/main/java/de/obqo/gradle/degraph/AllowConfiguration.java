@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 class AllowConfiguration implements Serializable {
 
+    private static final long serialVersionUID = 10L;
+
     private final boolean direct;
     private final Object[] slices;
 

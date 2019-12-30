@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 class LayerConfig implements Serializable {
 
+    private static final long serialVersionUID = 10L;
+
     private final boolean strict;
     private final String[] slices;
 

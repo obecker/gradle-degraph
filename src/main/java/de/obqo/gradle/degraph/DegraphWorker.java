@@ -1,73 +1,63 @@
 package de.obqo.gradle.degraph;
 
+import static de.schauderhaft.degraph.check.Check.customClasspath;
+import static de.schauderhaft.degraph.check.Check.violationFree;
+
 import java.io.File;
 import java.util.stream.Stream;
-
-import javax.inject.Inject;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.workers.WorkAction;
 import org.scalatest.matchers.MatchResult;
 
 import de.schauderhaft.degraph.check.ConstraintBuilder;
 import de.schauderhaft.degraph.check.JLayer;
 import de.schauderhaft.degraph.configuration.NamedPattern;
 
-import static de.schauderhaft.degraph.check.Check.customClasspath;
-import static de.schauderhaft.degraph.check.Check.violationFree;
-
 /**
  * @author Oliver Becker
  */
-public class DegraphWorker implements Runnable {
+public abstract class DegraphWorker implements WorkAction<DegraphWorkerParameters> {
 
-    private final DegraphConfiguration configuration;
-
-    private final String classpath;
-
-    private final File reportFile;
-
-    private final Logger logger = Logging.getLogger(Task.class);
-
-    @Inject
-    public DegraphWorker(final DegraphConfiguration configuration, final String classpath, final File reportFile) {
-        this.configuration = configuration;
-        this.classpath = classpath;
-        this.reportFile = reportFile;
-    }
+    private static final Logger logger = Logging.getLogger(Task.class);
 
     @Override
-    public void run() {
-        ConstraintBuilder constraint = customClasspath(this.classpath);
+    public void execute() {
+        DegraphConfiguration configuration = getParameters().getConfiguration().get();
+        String classpath = getParameters().getClasspath().get();
+        File reportFile = getParameters().getReportFile().getAsFile().get();
 
-        for (String including : this.configuration.getIncludings()) {
+        ConstraintBuilder constraint = customClasspath(classpath);
+
+        for (String including : configuration.getIncludings()) {
             constraint = constraint.including(including);
         }
 
-        for (String excluding : this.configuration.getExcludings()) {
+        for (String excluding : configuration.getExcludings()) {
             constraint = constraint.excluding(excluding);
         }
 
-        for (SlicingConfiguration slicing : this.configuration.getSlicings()) {
+        for (SlicingConfiguration slicing : configuration.getSlicings()) {
             constraint = constraint.withSlicing(slicing.getSliceType(), getPatterns(slicing));
             for (AllowConfiguration allow : slicing.getAllows()) {
                 constraint = allow.isDirect() ? constraint.allowDirect(getSlices(allow)) : constraint.allow(getSlices(allow));
             }
         }
 
-        this.reportFile.getParentFile().mkdirs();
-        constraint = constraint.printTo(this.reportFile.getPath());
+        reportFile.getParentFile().mkdirs();
+        constraint = constraint.printTo(reportFile.getPath());
 
-        this.logger.info("degraph constraints: {}", constraint);
+        logger.info("degraph constraints: {}", constraint);
 
         final MatchResult result = violationFree().apply(constraint);
 
-        this.logger.debug("degraph result: {}", result);
+        logger.debug("degraph result: {}", result);
 
         if (!result.matches()) {
-            throw new GradleException(String.format("%s\n\nSee the report at: %s", result.rawFailureMessage(), this.reportFile));
+            throw new GradleException(String.format("%s\n\nSee the report at: %s", result.rawFailureMessage(), reportFile));
         }
     }
 

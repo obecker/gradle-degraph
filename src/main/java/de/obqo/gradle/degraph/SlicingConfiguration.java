@@ -11,6 +11,8 @@ import java.util.List;
  */
 class SlicingConfiguration implements Serializable {
 
+    private static final long serialVersionUID = 10L;
+
     private final String sliceType;
     private final List<Object> patterns;
     private final List<AllowConfiguration> allows;

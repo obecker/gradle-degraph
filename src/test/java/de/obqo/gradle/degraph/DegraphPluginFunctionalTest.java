@@ -1,5 +1,7 @@
 package de.obqo.gradle.degraph;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -12,13 +14,8 @@ import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.BuildTask;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Oliver Becker
@@ -27,8 +24,8 @@ public class DegraphPluginFunctionalTest {
 
     private List<File> pluginClasspath;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         final URL pluginClasspathResource = getClass().getClassLoader().getResource("plugin-classpath.txt");
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.");
@@ -43,46 +40,46 @@ public class DegraphPluginFunctionalTest {
     }
 
     @Test
-    public void shouldSucceed() throws Exception {
+    void shouldSucceed() {
         BuildResult result = build("success.gradle");
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphMain");
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphTest");
     }
 
     @Test
-    public void shouldFailBecauseOfCycles() throws Exception {
+    void shouldFailBecauseOfCycles() {
         BuildResult result = buildAndFail("cycle.gradle");
         assertBuildResult(result, TaskOutcome.FAILED, "degraphMain");
     }
 
     @Test
-    public void shouldFailBecauseOfCyclesWithDefaultConfiguration() throws Exception {
+    void shouldFailBecauseOfCyclesWithDefaultConfiguration() {
         BuildResult result = buildAndFail("default.gradle");
         assertBuildResult(result, TaskOutcome.FAILED, "degraphMain");
     }
 
     @Test
-    public void shouldSucceedWithSlicings() throws Exception {
+    void shouldSucceedWithSlicings() {
         BuildResult result = build("allowed.gradle");
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphMain");
     }
 
     @Test
-    public void shouldFailBecauseOfDisallowedSlices() throws Exception {
+    void shouldFailBecauseOfDisallowedSlices() {
         BuildResult result = buildAndFail("disallowed.gradle");
         assertBuildResult(result, TaskOutcome.FAILED, "degraphMain");
     }
 
     @Test
-    public void shouldSucceedOnTestSources() throws Exception {
+    void shouldSucceedOnTestSources() {
         BuildResult result = build("test-sources.gradle");
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphTest");
 
-        assertThat(result.task(":degraphMain"), is(nullValue()));
+        assertThat(result.task(":degraphMain")).isNull();
     }
 
     @Test
-    public void shouldSucceedWithAdditionalSourceSets() throws Exception {
+    void shouldSucceedWithAdditionalSourceSets() {
         BuildResult result = build("source-sets.gradle");
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphMain");
         assertBuildResult(result, TaskOutcome.SUCCESS, "degraphTest");
@@ -90,7 +87,7 @@ public class DegraphPluginFunctionalTest {
     }
 
     @Test
-    public void shouldFailBecauseOfCyclesWithDifferentToolVersion() throws Exception {
+    void shouldFailBecauseOfCyclesWithDifferentToolVersion() {
         BuildResult result = buildAndFail("toolversion.gradle");
         assertBuildResult(result, TaskOutcome.FAILED, "degraphMain");
     }
@@ -118,12 +115,12 @@ public class DegraphPluginFunctionalTest {
         System.out.println(buildResult.getOutput());
 
         final BuildTask degraphTask = buildResult.task(":" + taskName);
-        assertThat(degraphTask, is(notNullValue()));
-        assertThat(degraphTask.getOutcome(), is(expectedOutcome));
+        assertThat(degraphTask).isNotNull();
+        assertThat(degraphTask.getOutcome()).isEqualTo(expectedOutcome);
     }
 
     @Test
-    public void shouldCachePreviousRun() throws Exception {
+    void shouldCachePreviousRun() {
         // given
         final String buildFile = "allowed.gradle";
 
