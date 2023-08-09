@@ -7,6 +7,14 @@ Using custom configuration settings you can define which package dependencies ar
 
 The latest version uses Degraph 0.1.4
 
+---
+
+**Important note**: the development on this project has stopped, mainly because Degraph isn't actively maintained any longer.
+I have started a new project **[Decycle](https://github.com/obecker/decycle)** (written in Java), that detects cycles,
+displays them as HTML, but removes the output for yed. It supports Java ≥ 11 and provides both a Gradle and a Maven plugin.
+
+---
+
 ## Installation
 
 The plugin has been released on the [Gradle Plugin Repository](https://plugins.gradle.org/plugin/de.obqo.gradle.degraph).
